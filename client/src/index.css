@@ -1,0 +1,45 @@
+@import "./styles/theme.css";
+@import "./styles/components.css";
+
+@import "./styles/theme.css";
+@import "./styles/components.css";
+@import "./styles/login.css";
+@import "./styles/register.css";
+@import "./styles/learning.css";
+@import "./styles/child-profile.css";
+@import "./styles/lesson.css";
+* {
+  box-sizing: border-box;
+}
+
+html {
+  min-width: 320px;
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+
+  background: var(--color-bg);
+  color: var(--color-text);
+
+  font-family: var(--font-main);
+
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+button {
+  -webkit-tap-highlight-color: transparent;
+}
+
+#root {
+  min-height: 100vh;
+}

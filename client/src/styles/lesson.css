@@ -1,0 +1,181 @@
+.lesson-page {
+  min-height: 100vh;
+
+  padding: 30px 20px 50px;
+
+  background: var(--color-bg);
+}
+
+.lesson-container {
+  width: min(100%, 700px);
+  margin: 0 auto;
+}
+
+.lesson-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  margin-bottom: 22px;
+}
+
+.lesson-back-button {
+  padding: 8px 0;
+
+  border: none;
+
+  background: transparent;
+  color: var(--color-text);
+
+  font-weight: 800;
+
+  cursor: pointer;
+}
+
+.lesson-level-label {
+  color: var(--color-muted);
+
+  font-size: 0.9rem;
+  font-weight: 800;
+}
+
+.lesson-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  margin-top: 30px;
+
+  padding: 34px 24px;
+
+  background: var(--color-surface);
+
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-large);
+
+  box-shadow: var(--shadow-soft);
+
+  text-align: center;
+}
+
+.lesson-instruction {
+  margin: 0 0 24px;
+
+  color: var(--color-muted);
+
+  font-weight: 700;
+}
+
+.lesson-word {
+  margin: 24px 0 18px;
+
+  color: var(--color-text);
+
+  font-size: clamp(2.2rem, 8vw, 4rem);
+}
+
+.lesson-encouragement {
+  margin: 20px 0 0;
+
+  color: var(--color-muted);
+
+  font-weight: 700;
+}
+
+.lesson-navigation {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+
+  margin-top: 22px;
+}
+
+.lesson-navigation .primary-button,
+.secondary-button {
+  flex: 1;
+}
+
+.secondary-button {
+  padding: 14px 24px;
+
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-medium);
+
+  background: var(--color-surface);
+  color: var(--color-text);
+
+  font-weight: 800;
+
+  cursor: pointer;
+}
+
+.secondary-button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.level-complete-page {
+  min-height: 100vh;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 30px 20px;
+
+  background: var(--color-bg);
+}
+
+.level-complete-card {
+  width: min(100%, 460px);
+
+  padding: 44px 32px;
+
+  background: var(--color-surface);
+
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-large);
+
+  box-shadow: var(--shadow-soft);
+
+  text-align: center;
+}
+
+.level-complete-icon {
+  font-size: 4rem;
+}
+
+.level-complete-label {
+  margin: 16px 0 8px;
+
+  color: #cf6f5b;
+
+  font-weight: 800;
+}
+
+.level-complete-card h1 {
+  margin: 0 0 10px;
+
+  font-size: 2.4rem;
+}
+
+.level-complete-card p {
+  color: var(--color-muted);
+}
+
+.complete-button {
+  width: 100%;
+
+  margin-top: 22px;
+  padding: 14px 20px;
+
+  border: none;
+  border-radius: var(--radius-medium);
+
+  background: var(--color-green);
+  color: var(--color-text);
+
+  font-weight: 800;
+
+  cursor: pointer;
+}

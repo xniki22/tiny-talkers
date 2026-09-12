@@ -1,0 +1,190 @@
+.primary-button,
+.sound-button,
+.level-card {
+  font-family: var(--font-main);
+}
+
+.primary-button {
+  border: none;
+  border-radius: var(--radius-medium);
+  padding: 14px 24px;
+
+  background: var(--color-coral);
+  color: white;
+
+  font-size: 1rem;
+  font-weight: 700;
+
+  cursor: pointer;
+  box-shadow: var(--shadow-soft);
+
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.primary-button:hover:not(:disabled) {
+  transform: translateY(-2px);
+}
+
+.primary-button:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.primary-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.sound-button {
+  border: 2px solid var(--color-sky);
+  border-radius: var(--radius-medium);
+
+  padding: 12px 18px;
+
+  background: #edf9ff;
+  color: var(--color-text);
+
+  font-size: 1rem;
+  font-weight: 700;
+
+  cursor: pointer;
+}
+
+.sound-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.progress-container {
+  width: 100%;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 18px;
+
+  background: #eee7dc;
+  border-radius: 999px;
+
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: var(--color-green);
+
+  border-radius: 999px;
+
+  transition: width 0.25s ease;
+}
+
+.progress-text {
+  display: block;
+
+  margin-top: 6px;
+
+  color: var(--color-muted);
+
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.object-image-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 220px;
+  height: 220px;
+
+  margin: 0 auto;
+
+  background: var(--color-surface);
+  border: 3px solid var(--color-yellow);
+  border-radius: var(--radius-large);
+
+  box-shadow: var(--shadow-soft);
+
+  overflow: hidden;
+}
+
+.object-image {
+  width: 100%;
+  height: 100%;
+
+  object-fit: contain;
+}
+
+.level-card {
+  width: 100%;
+
+  display: flex;
+  align-items: center;
+  gap: 18px;
+
+  padding: 20px;
+
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-large);
+
+  background: var(--color-surface);
+  color: var(--color-text);
+
+  text-align: left;
+
+  box-shadow: var(--shadow-soft);
+
+  cursor: pointer;
+}
+
+.level-card:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.level-card-icon {
+  min-width: 64px;
+  height: 64px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: #f8f3ff;
+  border-radius: 20px;
+
+  font-size: 2rem;
+}
+
+.level-card-content {
+  flex: 1;
+}
+
+.level-number {
+  color: var(--color-coral);
+
+  font-size: 0.85rem;
+  font-weight: 800;
+
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.level-card h3 {
+  margin: 4px 0 6px;
+
+  font-size: 1.3rem;
+}
+
+.level-card p {
+  margin: 0 0 8px;
+
+  color: var(--color-muted);
+}
+
+.level-progress,
+.level-locked {
+  font-size: 0.9rem;
+  font-weight: 700;
+}
