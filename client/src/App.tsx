@@ -790,18 +790,21 @@ function App() {
     selectedLevel
   ) {
     return (
-      <LevelCompletePage
-        levelNumber={
-          selectedLevel
-            .levelNumber ?? 0
-        }
-        levelTitle={
-          selectedLevel.title
-        }
-        onContinue={() =>
-          setPage("home")
-        }
-      />
+       <LevelCompletePage
+          levelNumber={
+            selectedLevel
+              .levelNumber ?? 0
+          }
+          levelTitle={
+            selectedLevel.title
+          }
+          totalStars={
+            completedLevelIds.length
+          }
+          onContinue={() =>
+            setPage("home")
+         }
+        />
     );
   }
 
