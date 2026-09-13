@@ -49,6 +49,9 @@ export function ChildHomePage({
   onSwitchProfile,
   onLogout,
 }: ChildHomePageProps) {
+  const totalStars =
+    completedLevelIds.length;
+
   return (
     <main className="learning-home">
       <section className="learning-home-header">
@@ -68,6 +71,21 @@ export function ChildHomePage({
                 {childName}
               </strong>
             </p>
+
+            <div className="learning-star-count">
+              <span className="learning-star-icon">
+                ⭐
+              </span>
+
+              <span>
+                <strong>
+                  {totalStars}
+                </strong>{" "}
+                {totalStars === 1
+                  ? "Star Earned"
+                  : "Stars Earned"}
+              </span>
+            </div>
           </div>
 
           <div className="learning-home-actions">
