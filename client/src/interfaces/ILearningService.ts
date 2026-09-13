@@ -1,13 +1,20 @@
-import type { ILevel } from "./ILevel";
-import type { IChildProgress } from "./IProgress";
+export type LearningItemType =
+  | "WORD"
+  | "PHRASE"
+  | "SENTENCE";
 
-export interface ILearningService {
-  getLevels(childId: string): Promise<ILevel[]>;
+export interface ILearningItem {
+  itemId: string;
 
-  getProgress(childId: string): Promise<IChildProgress>;
+  levelId: string;
 
-  completeItem(
-    childId: string,
-    itemId: string
-  ): Promise<IChildProgress>;
+  type: LearningItemType;
+
+  text: string;
+
+  imageUrl?: string;
+
+  audioUrl?: string;
+
+  orderNumber: number;
 }

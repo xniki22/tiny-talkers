@@ -1,4 +1,6 @@
-import { useState } from "react";
+import {
+  useState,
+} from "react";
 
 import { PrimaryButton } from "../components/buttons/PrimaryButton";
 import { SoundButton } from "../components/buttons/SoundButton";
@@ -7,15 +9,18 @@ import { ObjectImage } from "../components/learning/ObjectImage";
 
 import { browserAudioService } from "../services/BrowserAudioService";
 
-import type { ILevel } from "../interfaces/ILevel";
+import type {
+  ILevel,
+} from "../interfaces/ILevel";
 
 interface LessonPageProps {
   level: ILevel;
-  completedItemIds: string[];
+
+  completedItemIds?: string[];
 
   onBack: () => void;
 
-  onCompleteItem: (
+  onCompleteItem?: (
     levelId: string,
     itemId: string
   ) => Promise<void>;
@@ -25,7 +30,7 @@ interface LessonPageProps {
 
 export function LessonPage({
   level,
-  completedItemIds,
+  completedItemIds = [],
   onBack,
   onCompleteItem,
   onComplete,
@@ -33,25 +38,34 @@ export function LessonPage({
   const firstIncompleteIndex =
     level.items.findIndex(
       (item) =>
-        !completedItemIds.includes(item.itemId)
+        !completedItemIds.includes(
+          item.itemId
+        )
     );
 
   const startingIndex =
-    firstIncompleteIndex === -1
+    level.isCustom
       ? 0
-      : firstIncompleteIndex;
+      : firstIncompleteIndex === -1
+        ? 0
+        : firstIncompleteIndex;
 
-  const [currentIndex, setCurrentIndex] =
-    useState(startingIndex);
+  const [
+    currentIndex,
+    setCurrentIndex,
+  ] = useState(startingIndex);
 
-  const [isSaving, setIsSaving] =
-    useState(false);
+  const [
+    isSaving,
+    setIsSaving,
+  ] = useState(false);
 
   const currentItem =
     level.items[currentIndex];
 
   const isLastItem =
-    currentIndex === level.items.length - 1;
+    currentIndex ===
+    level.items.length - 1;
 
   const handleNext = async () => {
     if (isSaving) {
@@ -63,13 +77,19 @@ export function LessonPage({
     browserAudioService.stopAudio();
 
     try {
-      await onCompleteItem(
-        level.levelId,
-        currentItem.itemId
-      );
+      if (
+        onCompleteItem &&
+        !level.isCustom
+      ) {
+        await onCompleteItem(
+          level.levelId,
+          currentItem.itemId
+        );
+      }
 
       if (isLastItem) {
         await onComplete();
+
         return;
       }
 
@@ -95,6 +115,7 @@ export function LessonPage({
 
   const handleLeaveLesson = () => {
     browserAudioService.stopAudio();
+
     onBack();
   };
 
@@ -111,19 +132,27 @@ export function LessonPage({
           <button
             type="button"
             className="lesson-back-button"
-            onClick={handleLeaveLesson}
+            onClick={
+              handleLeaveLesson
+            }
           >
             ← Levels
           </button>
 
           <span className="lesson-level-label">
-            Level {level.levelNumber}
+            {level.isCustom
+              ? "Custom Level"
+              : `Level ${level.levelNumber}`}
           </span>
         </div>
 
         <ProgressBar
-          current={currentIndex + 1}
-          total={level.items.length}
+          current={
+            currentIndex + 1
+          }
+          total={
+            level.items.length
+          }
         />
 
         <section className="lesson-content">
@@ -131,10 +160,22 @@ export function LessonPage({
             Listen and say it with me
           </p>
 
-          <ObjectImage
-            imageUrl={currentItem.imageUrl}
-            altText={currentItem.text}
-          />
+          {currentItem.imageUrl ? (
+            <ObjectImage
+              imageUrl={
+                currentItem.imageUrl
+              }
+              altText={
+                currentItem.text
+              }
+            />
+          ) : (
+            <div className="custom-lesson-placeholder">
+              <span>
+                Aa
+              </span>
+            </div>
+          )}
 
           <h1 className="lesson-word">
             {currentItem.text}
@@ -155,7 +196,9 @@ export function LessonPage({
           <button
             type="button"
             className="secondary-button"
-            onClick={handleBackItem}
+            onClick={
+              handleBackItem
+            }
             disabled={
               currentIndex === 0 ||
               isSaving
@@ -169,7 +212,9 @@ export function LessonPage({
               isSaving
                 ? "Saving..."
                 : isLastItem
-                  ? "Finish Level"
+                  ? level.isCustom
+                    ? "Finish Practice"
+                    : "Finish Level"
                   : "Next"
             }
             onClick={() => {
