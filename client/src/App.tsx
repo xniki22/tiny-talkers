@@ -9,18 +9,31 @@ import { ChildProfilePage } from "./pages/ChildProfilePage";
 import { ChildHomePage } from "./pages/ChildHomePage";
 import { LessonPage } from "./pages/LessonPage";
 import { LevelCompletePage } from "./pages/LevelCompletePage";
+import { CreateCustomLevelPage } from "./pages/CreateCustomLevelPage";
 
 import { levels } from "./data/levels";
 
 import { authService } from "./services/authService";
 import { childService } from "./services/ChildService";
 import { progressService } from "./services/ProgressService";
+import { customLevelService } from "./services/CustomLevelService";
 
-import type { IUser } from "./interfaces/IUser";
-import type { IChildProfile } from "./interfaces/IChildProfile";
+import type {
+  IUser,
+} from "./interfaces/IUser";
 
+import type {
+  IChildProfile,
+} from "./interfaces/IChildProfile";
 
-  
+import type {
+  ICustomLevel,
+  ICustomLevelItemInput,
+} from "./interfaces/ICustomLevel";
+
+import type {
+  ILevel,
+} from "./interfaces/ILevel";
 
 type AppPage =
   | "login"
@@ -28,22 +41,30 @@ type AppPage =
   | "profiles"
   | "home"
   | "lesson"
-  | "complete";
+  | "complete"
+  | "create-custom-level";
 
 function App() {
-  const [page, setPage] =
-    useState<AppPage>("login");
-
+  const [
+    page,
+    setPage,
+  ] = useState<AppPage>(
+    "login"
+  );
 
   const [
     currentUser,
     setCurrentUser,
-  ] = useState<IUser | null>(null);
+  ] = useState<IUser | null>(
+    null
+  );
 
   const [
     children,
     setChildren,
-  ] = useState<IChildProfile[]>([]);
+  ] = useState<IChildProfile[]>(
+    []
+  );
 
   const [
     selectedChild,
@@ -55,7 +76,23 @@ function App() {
   const [
     selectedLevelId,
     setSelectedLevelId,
-  ] = useState<string | null>(null);
+  ] = useState<string | null>(
+    null
+  );
+
+  const [
+    selectedCustomLevel,
+    setSelectedCustomLevel,
+  ] = useState<ICustomLevel | null>(
+    null
+  );
+
+  const [
+    customLevels,
+    setCustomLevels,
+  ] = useState<ICustomLevel[]>(
+    []
+  );
 
   const [
     completedLevelIds,
@@ -70,12 +107,15 @@ function App() {
   const [
     completedItemCounts,
     setCompletedItemCounts,
-  ] = useState<Record<string, number>>(
-    {}
-  );
+  ] = useState<Record<
+    string,
+    number
+  >>({});
 
-  const [isLoading, setIsLoading] =
-    useState(true);
+  const [
+    isLoading,
+    setIsLoading,
+  ] = useState(true);
 
   const [
     isLessonLoading,
@@ -89,36 +129,112 @@ function App() {
         selectedLevelId
     ) ?? null;
 
-  const loadChildren = async () => {
-    const loadedChildren =
-      await childService.getChildren();
+  const customLessonLevel:
+    ILevel | null =
+      selectedCustomLevel
+        ? {
+            levelId:
+              selectedCustomLevel
+                .customLevelId,
 
-    setChildren(loadedChildren);
-  };
+            title:
+              selectedCustomLevel
+                .title,
 
-  const handleLogout = async () => {
-  try {
-    await authService.logout();
-  } finally {
-    setCurrentUser(null);
-    setSelectedChild(null);
-    setSelectedLevelId(null);
-    setCompletedLevelIds([]);
-    setCompletedItemIds([]);
-    setCompletedItemCounts({});
-    setChildren([]);
-    setPage("login");
-  }
-};
-const handleSwitchProfile = () => {
-  setSelectedChild(null);
-  setSelectedLevelId(null);
-  setCompletedLevelIds([]);
-  setCompletedItemIds([]);
-  setCompletedItemCounts({});
+            description:
+              "Personalized practice level.",
 
-  setPage("profiles");
-};
+            icon:
+              "Aa",
+
+            isCustom:
+              true,
+
+            items:
+              selectedCustomLevel
+                .items.map(
+                  (item) => ({
+                    itemId:
+                      item.itemId,
+
+                    levelId:
+                      selectedCustomLevel
+                        .customLevelId,
+
+                    type:
+                      item.type,
+
+                    text:
+                      item.text,
+
+                    orderNumber:
+                      item.orderNumber,
+                  })
+                ),
+          }
+        : null;
+
+  const loadChildren =
+    async () => {
+      const loadedChildren =
+        await childService.getChildren();
+
+      setChildren(
+        loadedChildren
+      );
+    };
+
+  const loadCustomLevels =
+    async (childId: string) => {
+      const loadedCustomLevels =
+        await customLevelService
+          .getCustomLevels(
+            childId
+          );
+
+      setCustomLevels(
+        loadedCustomLevels
+      );
+    };
+
+  const handleLogout =
+    async () => {
+      try {
+        await authService.logout();
+      } finally {
+        setCurrentUser(null);
+        setSelectedChild(null);
+        setSelectedLevelId(null);
+        setSelectedCustomLevel(
+          null
+        );
+        setCustomLevels([]);
+        setCompletedLevelIds([]);
+        setCompletedItemIds([]);
+        setCompletedItemCounts(
+          {}
+        );
+        setChildren([]);
+        setPage("login");
+      }
+    };
+
+  const handleSwitchProfile =
+    () => {
+      setSelectedChild(null);
+      setSelectedLevelId(null);
+      setSelectedCustomLevel(
+        null
+      );
+      setCustomLevels([]);
+      setCompletedLevelIds([]);
+      setCompletedItemIds([]);
+      setCompletedItemCounts(
+        {}
+      );
+
+      setPage("profiles");
+    };
 
   useEffect(() => {
     const checkAuthentication =
@@ -130,10 +246,13 @@ const handleSwitchProfile = () => {
 
           if (!user) {
             setPage("login");
+
             return;
           }
 
-          setCurrentUser(user);
+          setCurrentUser(
+            user
+          );
 
           await loadChildren();
 
@@ -146,49 +265,59 @@ const handleSwitchProfile = () => {
 
           setPage("login");
         } finally {
-          setIsLoading(false);
+          setIsLoading(
+            false
+          );
         }
       };
 
     void checkAuthentication();
   }, []);
 
-  const handleLogin = async (
-    email: string,
-    password: string
-  ) => {
-    const user =
-      await authService.login(
-        email,
-        password
+  const handleLogin =
+    async (
+      email: string,
+      password: string
+    ) => {
+      const user =
+        await authService.login(
+          email,
+          password
+        );
+
+      setCurrentUser(
+        user
       );
 
-    setCurrentUser(user);
+      await loadChildren();
 
-    await loadChildren();
+      setPage("profiles");
+    };
 
-    setPage("profiles");
-  };
+  const handleRegister =
+    async (
+      email: string,
+      password: string
+    ) => {
+      const user =
+        await authService.register(
+          email,
+          password
+        );
 
-  const handleRegister = async (
-    email: string,
-    password: string
-  ) => {
-    const user =
-      await authService.register(
-        email,
-        password
+      setCurrentUser(
+        user
       );
 
-    setCurrentUser(user);
+      await loadChildren();
 
-    await loadChildren();
-
-    setPage("profiles");
-  };
+      setPage("profiles");
+    };
 
   const loadChildProgress =
-    async (childId: string) => {
+    async (
+      childId: string
+    ) => {
       const completedLevels =
         await progressService
           .getCompletedLevels(
@@ -213,6 +342,7 @@ const handleSwitchProfile = () => {
               return {
                 levelId:
                   level.levelId,
+
                 count:
                   items.length,
               };
@@ -227,7 +357,9 @@ const handleSwitchProfile = () => {
 
       itemProgressResults.forEach(
         (result) => {
-          counts[result.levelId] =
+          counts[
+            result.levelId
+          ] =
             result.count;
         }
       );
@@ -235,31 +367,46 @@ const handleSwitchProfile = () => {
       setCompletedItemCounts(
         counts
       );
-  };
+    };
 
   const handleSelectChild =
-    async (
-      child: IChildProfile
-    ) => {
-      setIsLoading(true);
+  async (
+    child: IChildProfile
+  ) => {
+    setIsLoading(true);
+
+    try {
+      setSelectedChild(
+        child
+      );
+
+      await loadChildProgress(
+        child.childId
+      );
 
       try {
-        setSelectedChild(child);
-
-        await loadChildProgress(
+        await loadCustomLevels(
           child.childId
         );
-
-        setPage("home");
       } catch (error) {
         console.error(
-          "Could not load child progress:",
+          "Could not load custom levels:",
           error
         );
-      } finally {
-        setIsLoading(false);
+
+        setCustomLevels([]);
       }
-    };
+
+      setPage("home");
+    } catch (error) {
+      console.error(
+        "Could not load child progress:",
+        error
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleCreateChild =
     async (
@@ -267,13 +414,16 @@ const handleSwitchProfile = () => {
       avatar: string
     ) => {
       const child =
-        await childService.createChild(
-          displayName,
-          avatar
-        );
+        await childService
+          .createChild(
+            displayName,
+            avatar
+          );
 
       setChildren(
-        (previousChildren) => [
+        (
+          previousChildren
+        ) => [
           ...previousChildren,
           child,
         ]
@@ -281,23 +431,32 @@ const handleSwitchProfile = () => {
     };
 
   const handleSelectLevel =
-    async (levelId: string) => {
+    async (
+      levelId: string
+    ) => {
       if (!selectedChild) {
         return;
       }
 
-      setIsLessonLoading(true);
+      setIsLessonLoading(
+        true
+      );
 
       try {
         const completedItems =
           await progressService
             .getCompletedItems(
-              selectedChild.childId,
+              selectedChild
+                .childId,
               levelId
             );
 
         setCompletedItemIds(
           completedItems
+        );
+
+        setSelectedCustomLevel(
+          null
         );
 
         setSelectedLevelId(
@@ -311,8 +470,29 @@ const handleSwitchProfile = () => {
           error
         );
       } finally {
-        setIsLessonLoading(false);
+        setIsLessonLoading(
+          false
+        );
       }
+    };
+
+  const handleSelectCustomLevel =
+    (
+      customLevel: ICustomLevel
+    ) => {
+      setSelectedLevelId(
+        null
+      );
+
+      setSelectedCustomLevel(
+        customLevel
+      );
+
+      setCompletedItemIds(
+        []
+      );
+
+      setPage("lesson");
     };
 
   const handleCompleteItem =
@@ -327,7 +507,8 @@ const handleSwitchProfile = () => {
       const updatedItems =
         await progressService
           .completeItem(
-            selectedChild.childId,
+            selectedChild
+              .childId,
             levelId,
             itemId
           );
@@ -337,8 +518,11 @@ const handleSwitchProfile = () => {
       );
 
       setCompletedItemCounts(
-        (previousCounts) => ({
+        (
+          previousCounts
+        ) => ({
           ...previousCounts,
+
           [levelId]:
             updatedItems.length,
         })
@@ -357,7 +541,9 @@ const handleSwitchProfile = () => {
       const updatedCompletedLevels =
         await progressService
           .completeLevel(
-            selectedChild.childId,
+            selectedChild
+              .childId,
+
             selectedLevel.levelId
           );
 
@@ -368,13 +554,101 @@ const handleSwitchProfile = () => {
       setPage("complete");
     };
 
+  const handleCompleteCustomLevel =
+    async () => {
+      setSelectedCustomLevel(
+        null
+      );
+
+      setPage("home");
+    };
+
+  const handleCreateCustomLevel =
+    async (
+      title: string,
+      items: ICustomLevelItemInput[]
+    ): Promise<ICustomLevel> => {
+      if (!selectedChild) {
+        throw new Error(
+          "Please select a child first."
+        );
+      }
+
+      const customLevel =
+        await customLevelService
+          .createCustomLevel(
+            selectedChild
+              .childId,
+            title,
+            items
+          );
+
+      setCustomLevels(
+        (
+          previousLevels
+        ) => [
+          ...previousLevels,
+          customLevel,
+        ]
+      );
+
+      setPage("home");
+
+      return customLevel;
+    };
+
+  const handleDeleteCustomLevel =
+    async (
+      customLevelId: string
+    ) => {
+      if (!selectedChild) {
+        return;
+      }
+
+      const confirmed =
+        window.confirm(
+          "Delete this custom level?"
+        );
+
+      if (!confirmed) {
+        return;
+      }
+
+      try {
+        await customLevelService
+          .deleteCustomLevel(
+            selectedChild
+              .childId,
+            customLevelId
+          );
+
+        setCustomLevels(
+          (
+            previousLevels
+          ) =>
+            previousLevels.filter(
+              (level) =>
+                level.customLevelId !==
+                customLevelId
+            )
+        );
+      } catch (error) {
+        console.error(
+          "Could not delete custom level:",
+          error
+        );
+      }
+    };
+
   if (
     isLoading ||
     isLessonLoading
   ) {
     return (
       <main className="learning-home">
-        <p>Loading...</p>
+        <p>
+          Loading...
+        </p>
       </main>
     );
   }
@@ -385,38 +659,103 @@ const handleSwitchProfile = () => {
   ) {
     return (
       <LoginPage
-        onLogin={handleLogin}
+        onLogin={
+          handleLogin
+        }
         onGoToRegister={() =>
-          setPage("register")
+          setPage(
+            "register"
+          )
         }
       />
     );
   }
 
-  if (page === "register") {
+  if (
+    page === "register"
+  ) {
     return (
       <RegisterPage
         onRegister={
           handleRegister
         }
         onGoToLogin={() =>
-          setPage("login")
+          setPage(
+            "login"
+          )
         }
       />
     );
   }
 
-  if (page === "profiles") {
+  if (
+    page === "profiles"
+  ) {
     return (
       <ChildProfilePage
-        children={children}
+        children={
+          children
+        }
         onSelectChild={
           handleSelectChild
         }
         onCreateChild={
           handleCreateChild
         }
-        onLogout={handleLogout}
+        onLogout={
+          handleLogout
+        }
+      />
+    );
+  }
+
+  if (
+    page ===
+      "create-custom-level" &&
+    selectedChild
+  ) {
+    return (
+      <CreateCustomLevelPage
+        childName={
+          selectedChild
+            .displayName
+        }
+
+        childId={
+          selectedChild.childId
+        }
+        onBack={() =>
+          setPage("home")
+        }
+        onSave={
+          handleCreateCustomLevel
+        }
+      />
+    );
+  }
+
+  if (
+    page === "lesson" &&
+    customLessonLevel
+  ) {
+    return (
+      <LessonPage
+        level={
+          customLessonLevel
+        }
+        completedItemIds={
+          []
+        }
+        onBack={() => {
+          setSelectedCustomLevel(
+            null
+          );
+
+          setPage("home");
+        }}
+        onComplete={
+          handleCompleteCustomLevel
+        }
       />
     );
   }
@@ -427,7 +766,9 @@ const handleSwitchProfile = () => {
   ) {
     return (
       <LessonPage
-        level={selectedLevel}
+        level={
+          selectedLevel
+        }
         completedItemIds={
           completedItemIds
         }
@@ -451,7 +792,8 @@ const handleSwitchProfile = () => {
     return (
       <LevelCompletePage
         levelNumber={
-          selectedLevel.levelNumber
+          selectedLevel
+            .levelNumber ?? 0
         }
         levelTitle={
           selectedLevel.title
@@ -464,44 +806,61 @@ const handleSwitchProfile = () => {
   }
 
   if (!selectedChild) {
+    return (
+      <ChildProfilePage
+        children={
+          children
+        }
+        onSelectChild={
+          handleSelectChild
+        }
+        onCreateChild={
+          handleCreateChild
+        }
+        onLogout={
+          handleLogout
+        }
+      />
+    );
+  }
+
   return (
-    <ChildProfilePage
-      children={children}
-      onSelectChild={
-        handleSelectChild
+    <ChildHomePage
+      childName={
+        selectedChild
+          .displayName
       }
-      onCreateChild={
-        handleCreateChild
+      completedLevelIds={
+        completedLevelIds
+      }
+      completedItemCounts={
+        completedItemCounts
+      }
+      customLevels={
+        customLevels
+      }
+      onSelectLevel={
+        handleSelectLevel
+      }
+      onSelectCustomLevel={
+        handleSelectCustomLevel
+      }
+      onCreateCustomLevel={() =>
+        setPage(
+          "create-custom-level"
+        )
+      }
+      onDeleteCustomLevel={
+        handleDeleteCustomLevel
+      }
+      onSwitchProfile={
+        handleSwitchProfile
       }
       onLogout={
         handleLogout
       }
     />
   );
-}
-
-return (
-  <ChildHomePage
-    childName={
-      selectedChild.displayName
-    }
-    completedLevelIds={
-      completedLevelIds
-    }
-    completedItemCounts={
-      completedItemCounts
-    }
-    onSelectLevel={
-      handleSelectLevel
-    }
-    onSwitchProfile={
-      handleSwitchProfile
-    }
-    onLogout={
-      handleLogout
-    }
-  />
-);
 }
 
 export default App;

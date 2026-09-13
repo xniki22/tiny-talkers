@@ -8,7 +8,7 @@ export interface ILearningItem {
   levelId: string;
   type: LearningItemType;
   text: string;
-  imageUrl: string;
+  imageUrl?: string;
   audioUrl?: string;
   orderNumber: number;
 }

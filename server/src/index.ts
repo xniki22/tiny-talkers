@@ -1,9 +1,11 @@
 import express from "express";
 import cors from "cors";
+import "dotenv/config";
 
 import { progressRoutes } from "./progress/progressRoutes";
 import { childRoutes } from "./children/childRoutes";
 import { authRoutes } from "./auth/authRoutes";
+import { customLevelRoutes } from "./customLevels/customLevelRoutes";
 
 const app = express();
 
@@ -41,6 +43,11 @@ app.use(
 app.use(
   "/children",
   childRoutes
+);
+
+app.use(
+  "/custom-levels",
+  customLevelRoutes
 );
 
 app.listen(PORT, () => {

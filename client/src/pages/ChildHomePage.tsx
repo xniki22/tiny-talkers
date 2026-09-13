@@ -1,5 +1,10 @@
 import { LevelCard } from "../components/learning/LevelCard";
+
 import { levels } from "../data/levels";
+
+import type {
+  ICustomLevel,
+} from "../interfaces/ICustomLevel";
 
 interface ChildHomePageProps {
   childName: string;
@@ -11,9 +16,21 @@ interface ChildHomePageProps {
     number
   >;
 
+  customLevels: ICustomLevel[];
+
   onSelectLevel: (
     levelId: string
   ) => void;
+
+  onSelectCustomLevel: (
+    customLevel: ICustomLevel
+  ) => void;
+
+  onCreateCustomLevel: () => void;
+
+  onDeleteCustomLevel: (
+    customLevelId: string
+  ) => Promise<void>;
 
   onSwitchProfile: () => void;
 
@@ -24,7 +41,11 @@ export function ChildHomePage({
   childName,
   completedLevelIds,
   completedItemCounts,
+  customLevels,
   onSelectLevel,
+  onSelectCustomLevel,
+  onCreateCustomLevel,
+  onDeleteCustomLevel,
   onSwitchProfile,
   onLogout,
 }: ChildHomePageProps) {
@@ -43,7 +64,9 @@ export function ChildHomePage({
 
             <p>
               Learning with{" "}
-              <strong>{childName}</strong>
+              <strong>
+                {childName}
+              </strong>
             </p>
           </div>
 
@@ -51,7 +74,9 @@ export function ChildHomePage({
             <button
               type="button"
               className="secondary-button"
-              onClick={onSwitchProfile}
+              onClick={
+                onSwitchProfile
+              }
             >
               Switch Profile
             </button>
@@ -69,50 +94,180 @@ export function ChildHomePage({
         </div>
 
         <p className="learning-home-description">
-          Choose a level and practice new words,
-          phrases, and sentences.
+          Choose a level and practice new
+          words, phrases, and sentences.
         </p>
       </section>
 
-      <section className="level-list">
-        {levels.map((level, index) => {
-          const previousLevel =
-            index > 0
-              ? levels[index - 1]
-              : null;
+      <section className="learning-section">
+        <div className="learning-section-heading">
+          <div>
+            <p className="learning-section-label">
+              Learning Path
+            </p>
 
-          const isUnlocked =
-            index === 0 ||
-            (
-              previousLevel !== null &&
-              completedLevelIds.includes(
-                previousLevel.levelId
-              )
-            );
+            <h2>
+              Core Levels
+            </h2>
+          </div>
+        </div>
 
-          const completedItems =
-            completedItemCounts[
-              level.levelId
-            ] ?? 0;
+        <div className="level-list">
+          {levels.map(
+            (level, index) => {
+              const previousLevel =
+                index > 0
+                  ? levels[
+                      index - 1
+                    ]
+                  : null;
 
-          return (
-            <LevelCard
-              key={level.levelId}
-              level={level}
-              completedItems={
-                completedItems
-              }
-              isUnlocked={
-                isUnlocked
-              }
-              onClick={() =>
-                onSelectLevel(
+              const isUnlocked =
+                index === 0 ||
+                (
+                  previousLevel !==
+                    null &&
+                  completedLevelIds.includes(
+                    previousLevel.levelId
+                  )
+                );
+
+              const completedItems =
+                completedItemCounts[
                   level.levelId
-                )
-              }
-            />
-          );
-        })}
+                ] ?? 0;
+
+              return (
+                <LevelCard
+                  key={
+                    level.levelId
+                  }
+                  level={level}
+                  completedItems={
+                    completedItems
+                  }
+                  isUnlocked={
+                    isUnlocked
+                  }
+                  onClick={() =>
+                    onSelectLevel(
+                      level.levelId
+                    )
+                  }
+                />
+              );
+            }
+          )}
+        </div>
+      </section>
+
+      <section className="learning-section custom-level-section">
+        <div className="learning-section-heading custom-level-section-heading">
+          <div>
+            <p className="learning-section-label">
+              Personalized Practice
+            </p>
+
+            <h2>
+              Custom Levels
+            </h2>
+
+            <p>
+              Create practice using words
+              and sentences that are useful
+              for {childName}.
+            </p>
+          </div>
+
+          <button
+            type="button"
+            className="primary-button"
+            onClick={
+              onCreateCustomLevel
+            }
+          >
+            Create Custom Level
+          </button>
+        </div>
+
+        {customLevels.length ===
+        0 ? (
+          <div className="custom-level-empty">
+            <h3>
+              No custom levels yet
+            </h3>
+
+            <p>
+              Create a personalized level
+              with words, phrases, or
+              sentences you want{" "}
+              {childName} to practice.
+            </p>
+          </div>
+        ) : (
+          <div className="custom-level-list">
+            {customLevels.map(
+              (customLevel) => (
+                <article
+                  className="custom-level-card-home"
+                  key={
+                    customLevel.customLevelId
+                  }
+                >
+                  <button
+                    type="button"
+                    className="custom-level-open-button"
+                    onClick={() =>
+                      onSelectCustomLevel(
+                        customLevel
+                      )
+                    }
+                  >
+                    <div className="custom-level-icon">
+                      Aa
+                    </div>
+
+                    <div className="custom-level-card-content">
+                      <span className="custom-level-badge">
+                        Custom
+                      </span>
+
+                      <h3>
+                        {
+                          customLevel.title
+                        }
+                      </h3>
+
+                      <p>
+                        {
+                          customLevel
+                            .items.length
+                        }{" "}
+                        practice{" "}
+                        {customLevel.items
+                          .length === 1
+                          ? "item"
+                          : "items"}
+                      </p>
+                    </div>
+                  </button>
+
+                  <button
+                    type="button"
+                    className="custom-delete-button"
+                    onClick={() => {
+                      void onDeleteCustomLevel(
+                        customLevel.customLevelId
+                      );
+                    }}
+                  >
+                    Delete
+                  </button>
+                </article>
+              )
+            )}
+          </div>
+        )}
       </section>
     </main>
   );

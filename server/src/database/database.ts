@@ -52,6 +52,28 @@ db.exec(`
     completed_at TEXT,
     UNIQUE(child_id, level_id, item_id)
   );
+
+  CREATE TABLE IF NOT EXISTS custom_levels (
+    custom_level_id TEXT PRIMARY KEY,
+    child_id TEXT NOT NULL,
+    title TEXT NOT NULL,
+    created_at TEXT NOT NULL,
+    FOREIGN KEY (child_id)
+      REFERENCES children(child_id)
+      ON DELETE CASCADE
+  );
+
+  CREATE TABLE IF NOT EXISTS custom_level_items (
+    item_id TEXT PRIMARY KEY,
+    custom_level_id TEXT NOT NULL,
+    text TEXT NOT NULL,
+    item_type TEXT NOT NULL,
+    order_number INTEGER NOT NULL,
+    created_at TEXT NOT NULL,
+    FOREIGN KEY (custom_level_id)
+      REFERENCES custom_levels(custom_level_id)
+      ON DELETE CASCADE
+  );
 `);
 
 interface TableColumnRow {
@@ -82,4 +104,14 @@ db.exec(`
   CREATE INDEX IF NOT EXISTS
     idx_children_user_id
   ON children(user_id);
+
+  CREATE INDEX IF NOT EXISTS
+    idx_custom_levels_child_id
+  ON custom_levels(child_id);
+
+  CREATE INDEX IF NOT EXISTS
+    idx_custom_level_items_level_id
+  ON custom_level_items(
+    custom_level_id
+  );
 `);
