@@ -1,7 +1,11 @@
 import Database from "better-sqlite3";
 
+const databasePath =
+  process.env.DATABASE_PATH ??
+  "tiny-talkers.db";
+
 export const db =
-  new Database("tiny-talkers.db");
+  new Database(databasePath);
 
 db.pragma("foreign_keys = ON");
 
