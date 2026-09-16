@@ -1,3 +1,5 @@
+/// <reference types="node" />
+
 process.env.DATABASE_PATH =
   ":memory:";
 

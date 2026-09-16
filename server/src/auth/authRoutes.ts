@@ -1,6 +1,10 @@
 import { Router } from "express";
 
 import { AuthenticationManager } from "./AuthenticationManager";
+import {
+  loginRateLimiter,
+  registerRateLimiter,
+} from "./authRateLimiters";
 
 const router = Router();
 
@@ -9,6 +13,7 @@ const authenticationManager =
 
 router.post(
   "/register",
+  registerRateLimiter,
   async (request, response) => {
     const {
       email,
@@ -64,6 +69,7 @@ router.post(
 
 router.post(
   "/login",
+  loginRateLimiter,
   async (request, response) => {
     const {
       email,
