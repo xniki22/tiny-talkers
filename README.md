@@ -267,6 +267,10 @@ custom_level_items
 ```text
 tiny-talkers/
 |
+├── .github/
+|   └── workflows/
+|       └── ci.yml
+|
 ├── client/
 |   ├── public/
 |   |   └── images/
@@ -283,14 +287,23 @@ tiny-talkers/
 |
 ├── server/
 |   ├── .env.example
+|   ├── src/
+|   |   ├── auth/
+|   |   ├── children/
+|   |   ├── customLevels/
+|   |   ├── database/
+|   |   ├── progress/
+|   |   ├── app.ts
+|   |   └── index.ts
 |   |
-|   └── src/
-|       ├── auth/
-|       ├── children/
-|       ├── customLevels/
-|       ├── database/
-|       ├── progress/
-|       └── index.ts
+|   ├── tests/
+|   |   ├── auth/
+|   |   ├── customLevels/
+|   |   ├── security/
+|   |   └── setup.ts
+|   |
+|   ├── tsconfig.test.json
+|   └── vitest.config.mts
 |
 ├── .gitignore
 └── README.md
@@ -305,21 +318,27 @@ Because Tiny Talkers is designed around children, security and privacy are impor
 Currently implemented measures include:
 
 - Passwords are hashed using Argon2
-- Authentication sessions are stored in SQLite
+- Authentication sessions are stored in SQLite and expire after seven days
+- Logout invalidates the active session
 - Protected child and progress routes require authentication
 - Child profiles are associated with their parent account
 - Backend ownership checks prevent parents from accessing another parent's child profiles
 - Custom-level routes verify ownership of the selected child
 - Progress ownership checks protect each child's learning data
+- Login requests are rate limited to 10 requests per 15 minutes
+- Registration requests are rate limited to 5 requests per hour
 - Local database files are excluded from Git
 - Environment files containing secrets are excluded from Git
 - Child voice recordings are not stored or uploaded
 - Audio prompts use browser speech synthesis
 - AI-generated learning content is presented to the parent for review before being saved for the child
+- Automated backend tests verify authentication, authorization, custom-level validation, and rate-limiting behavior
+- GitHub Actions automatically builds the server, runs backend tests, and builds the client for changes submitted to `main`
+- The `main` branch requires pull requests and successful CI checks before merging and is protected from force pushes and deletion
 
 The current development version stores the session ID in browser `localStorage` and sends it to authenticated backend routes as a Bearer token.
 
-For a future production release, authentication and security can be strengthened with HttpOnly secure cookies, HTTPS, rate limiting, additional environment-based configuration, centralized authentication middleware, and additional automated security testing.
+For a future production release, authentication and security can be strengthened with HttpOnly secure cookies, HTTPS, additional environment-based configuration, centralized authentication middleware, expanded frontend and backend testing, and production monitoring.
 
 ---
 
@@ -420,6 +439,39 @@ Both frontend and backend builds have been successfully tested during developmen
 
 ---
 
+## Automated Testing and CI
+
+Tiny Talkers includes automated backend tests using Vitest and Supertest.
+
+The current automated test suite contains 26 tests covering:
+
+- Parent registration and login
+- Password validation
+- Protection against password-hash exposure
+- Session authentication and invalid-session handling
+- Logout and session invalidation
+- Parent-to-child authorization
+- Protection against cross-parent progress access and modification
+- Protection of custom-level data between parent accounts
+- Custom-level input validation
+- AI-generation route authorization and input validation
+- Login rate limiting
+- Registration rate limiting
+
+Tests use an isolated in-memory SQLite database so development data is not modified during automated testing. AI-related authorization and validation tests do not make real OpenAI API requests or consume API credits.
+
+GitHub Actions provides continuous integration for the repository. For pull requests targeting `main`, CI:
+
+1. Installs server dependencies
+2. Builds the server
+3. Runs the automated server test suite
+4. Installs client dependencies
+5. Builds the client
+
+The `main` branch is protected by a GitHub ruleset. Changes must be submitted through a pull request, and both the **Server Build and Tests** and **Client Build** checks must pass before merging.
+
+---
+
 ## Hackathon Development
 
 Tiny Talkers existed as a learning application before the AI hackathon work began. During the hackathon development period, the project was substantially expanded with personalized AI-powered learning functionality and additional child engagement features.
@@ -438,6 +490,12 @@ Major additions during this development period include:
 - Star rewards for completed core levels
 - Level-completion celebration improvements
 - Replacement of previous learning images with newly generated child-friendly illustrations
+- Automated backend testing with Vitest and Supertest
+- Authentication and authorization security tests
+- Cross-parent data-access protection tests
+- Authentication rate limiting and automated rate-limit tests
+- GitHub Actions continuous integration for server tests and client/server builds
+- Protected `main` branch requiring pull requests and successful CI checks
 
 The six structured core learning levels remain available independently of the AI feature.
 
@@ -466,6 +524,10 @@ Currently working:
 - Star rewards
 - Separate progress for each child
 - Protected backend routes
+- Login and registration rate limiting
+- Automated authentication, authorization, validation, and rate-limiting tests
+- GitHub Actions continuous integration
+- Protected pull-request workflow for `main`
 - AI-generated custom levels
 - Parent review and editing of AI-generated content
 - Custom-level saving
@@ -498,9 +560,11 @@ Potential future improvements include:
 - Password reset
 - Accessibility improvements
 - Additional automated content-safety checks
-- More automated backend and frontend tests
-- CI/CD
-- Production cookie authentication
+- Expanded frontend and backend test coverage
+- Continuous deployment after a production hosting environment is selected
+- HttpOnly secure-cookie authentication
+- HTTPS and production security configuration
+- Production monitoring and logging
 - Production deployment
 - Additional child-friendly rewards
 - More personalization options
